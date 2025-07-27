@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Users</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" defer></script>
+</head>
+<body class="container mt-5">
+
+  <h1 class="mb-4">All Users</h1>
+
+  <a href="/users/new" class="btn btn-primary mb-3">Add User</a>
+
+  <button type="button" class="btn btn-info mb-3 ms-2" data-bs-toggle="modal" data-bs-target="#jwtInfoModal">
+    Show JWT Info
+  </button>
+
+  <div class="modal fade" id="jwtInfoModal" tabindex="-1" aria-labelledby="jwtInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="jwtInfoModalLabel">JWT Token Information</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Token Expiration:</strong> 1 hour</p>
+          <p><strong>Token Structure:</strong> Header, Payload, Signature</p>
+          <p><strong>Token Usage:</strong> Include in <code>Authorization</code> header as <code>Bearer &lt;token&gt;</code></p>
+          <p><strong>Secret:</strong> Stored in <code>.env</code> as <code>JWT_SECRET</code></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="list-group mb-5">
+    <% users.forEach(user => { %>
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <%= user.name %> - <%= user.email %> - Age: <%= user.age %>
+        <div>
+          <a href="/users/<%= user._id %>/edit" class="btn btn-sm btn-warning">Edit</a>
+          <form action="/users/<%= user._id %>/delete" method="POST" class="d-inline">
+            <button class="btn btn-sm btn-danger">Delete</button>
+          </form>
+        </div>
+      </li>
+    <% }); %>
+  </ul>
+
+  <h2 class="mb-3">Upload a File(any file)</h2>
+  <form action="/upload" method="POST" enctype="multipart/form-data" class="mb-5">
+    <div class="mb-3">
+      <input type="file" name="file" class="form-control" required />
+    </div>
+    <button class="btn btn-success">Upload</button>
+  </form>
+
+  <h2 class="mb-3">External Users (Fetched from JSPON Placeholder API)</h2>
+  <button onclick="loadExternalUsers()" class="btn btn-outline-primary mb-3">Load Users from API</button>
+  <ul id="external-users" class="list-group"></ul>
+
+  <script>
+    async function loadExternalUsers() {
+      const res = await fetch('/external-users');
+      const users = await res.json();
+      const list = document.getElementById('external-users');
+      list.innerHTML = '';
+      users.forEach(user => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = user.name + ' (' + user.email + ')';
+        list.appendChild(li);
+      });
+    }
+  </script>
+
+</body>
+</html>
